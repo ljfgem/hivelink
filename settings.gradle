@@ -1,0 +1,4 @@
+rootProject.name = 'hivelink'
+include 'hivelink-core'
+
+project(':hivelink-core').name = 'hivelink-core'

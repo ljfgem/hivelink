@@ -1,0 +1,7 @@
+org.apache.hadoop:* = 2.7.3
+org.apache.hive:hive-metastore = 2.3.7
+com.github.linkedin.iceberg:iceberg-hive-metastore = 0.11.1.1
+
+# test deps
+junit:junit = 4.12
+org.apache.hive:hive-exec = 2.3.7
