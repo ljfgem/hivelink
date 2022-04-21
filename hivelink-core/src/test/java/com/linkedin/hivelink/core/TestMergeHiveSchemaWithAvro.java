@@ -14,11 +14,11 @@
 
 package com.linkedin.hivelink.core;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.avro.LogicalTypes;
@@ -337,7 +337,7 @@ public class TestMergeHiveSchemaWithAvro {
     ObjectMapper mapper = new ObjectMapper();
     try {
       return JacksonUtils.toObject(mapper.readTree(json));
-    } catch (JsonProcessingException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
