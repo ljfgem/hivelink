@@ -11,14 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.linkedin.hivelink.core;
-
-import java.util.HashMap;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.iceberg.hive.HiveCatalog;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,15 +35,13 @@ public abstract class HiveMetastoreTest {
   protected static TestHiveMetastore metastore;
 
   @BeforeClass
-  public static void startMetastore() throws Exception {
-    HiveMetastoreTest.metastore = new TestHiveMetastore();
+  public static void startMetastore() throws MetaException {
+    metastore = new TestHiveMetastore();
     metastore.start();
-    HiveMetastoreTest.hiveConf = metastore.hiveConf();
-    HiveMetastoreTest.metastoreClient = new HiveMetaStoreClient(hiveConf);
-    String dbPath = metastore.getDatabasePath(DB_NAME);
-    Database db = new Database(DB_NAME, "description", dbPath, new HashMap<>());
-    metastoreClient.createDatabase(db);
-    HiveMetastoreTest.catalog = new HiveCatalog(hiveConf);
+    hiveConf = metastore.hiveConf();
+    catalog = new HiveCatalog(hiveConf);
+    metastoreClient = metastore.getMetastoreClient();
+    metastore.createDatabase(DB_NAME);
   }
 
   @AfterClass

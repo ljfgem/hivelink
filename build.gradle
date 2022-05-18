@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import groovy.transform.Memoized
 
 plugins {
@@ -67,6 +66,12 @@ subprojects {
 
   dependencies {
     testCompile 'junit:junit'
+    testCompile 'org.junit.jupiter:junit-jupiter-params'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+  }
+
+  test {
+    useJUnitPlatform() //enables JUnit5
   }
 
   spotless {
@@ -74,6 +79,7 @@ subprojects {
       importOrder('java', 'javax', 'com', 'org', 'com.linkedin.hivelink', '\\#')
       removeUnusedImports()
       eclipse().configFile("${rootDir}/gradle/spotless/codestyle-eclipse.xml")
+      licenseHeaderFile file("${rootDir}/gradle/license/LICENSE_HEADER")
     }
   }
 }

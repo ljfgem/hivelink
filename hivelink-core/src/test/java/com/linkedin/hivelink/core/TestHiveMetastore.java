@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.linkedin.hivelink.core;
 
 import java.io.File;
@@ -22,6 +21,7 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,9 +31,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.IHMSHandler;
 import org.apache.hadoop.hive.metastore.RetryingHMSHandler;
 import org.apache.hadoop.hive.metastore.TSetIpAddressProcessor;
+import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.iceberg.common.DynConstructors;
 import org.apache.iceberg.common.DynMethods;
 import org.apache.iceberg.hadoop.Util;
@@ -83,6 +86,10 @@ public class TestHiveMetastore {
   private TServer server;
   private HiveMetaStore.HMSHandler baseHandler;
   private HiveClientPool clientPool;
+  private HiveMetaStoreClient hiveMetaStoreClient;
+
+  public TestHiveMetastore() {
+  }
 
   /**
    * Starts a TestHiveMetastore with the default connection pool size (5) and the default HiveConf.
@@ -119,6 +126,7 @@ public class TestHiveMetastore {
       this.server = newThriftServer(socket, poolSize, hiveConf);
       this.executorService = Executors.newSingleThreadExecutor();
       this.executorService.submit(() -> server.serve());
+      hiveMetaStoreClient = getMetastoreClient();
 
       // in Hive3, setting this as a system prop ensures that it will be picked up whenever a new HiveConf is created
       System.setProperty(HiveConf.ConfVars.METASTOREURIS.varname, hiveConf.getVar(HiveConf.ConfVars.METASTOREURIS));
@@ -186,6 +194,21 @@ public class TestHiveMetastore {
           && !fileStatus.getPath().getName().equals("metastore_db")) {
         fs.delete(fileStatus.getPath(), true);
       }
+    }
+  }
+
+  public HiveMetaStoreClient getMetastoreClient() throws MetaException {
+    if (hiveMetaStoreClient == null) {
+      hiveMetaStoreClient = new HiveMetaStoreClient(hiveConf);
+    }
+    return hiveMetaStoreClient;
+  }
+
+  public void createDatabase(String dbName) {
+    try {
+      getMetastoreClient().createDatabase(new Database(dbName, null, getDatabasePath(dbName), new HashMap<>()));
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot create database: " + dbName, e);
     }
   }
 

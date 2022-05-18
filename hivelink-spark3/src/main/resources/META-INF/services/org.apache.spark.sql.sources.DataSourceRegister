@@ -1,0 +1,2 @@
+# Spark's DatasourceV2 registration is through SPI
+com.linkedin.hivelink.spark3.HivelinkSource

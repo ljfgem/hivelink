@@ -15,3 +15,5 @@ target/
 derby.log
 .DS_Store
 *.patch
+*/metastore_db/
+*/*.*/

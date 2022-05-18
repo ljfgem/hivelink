@@ -1,4 +1,10 @@
 rootProject.name = 'hivelink'
 include 'hivelink-core'
+include 'hivelink-spark'
+include 'hivelink-spark2'
+include 'hivelink-spark3'
 
 project(':hivelink-core').name = 'hivelink-core'
+project(':hivelink-spark').name = 'hivelink-spark'
+project(':hivelink-spark2').name = 'hivelink-spark2'
+project(':hivelink-spark3').name = 'hivelink-spark3'
