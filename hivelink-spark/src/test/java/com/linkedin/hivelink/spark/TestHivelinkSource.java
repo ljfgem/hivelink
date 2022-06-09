@@ -31,10 +31,10 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.linkedin.hivelink.core.TestHiveMetastore;
 
@@ -45,22 +45,22 @@ public abstract class TestHivelinkSource {
   protected static SparkSession spark;
   protected static TestHiveMetastore metastore;
 
-  @BeforeAll
-  static void setup() {
+  @BeforeClass
+  public static void setup() {
     spark = SparkSession.builder().appName("unit test").master("local[2]").getOrCreate();
     metastore = new TestHiveMetastore();
     metastore.start();
     metastore.createDatabase(DB_NAME);
   }
 
-  @AfterAll
-  static void teardown() {
+  @AfterClass
+  public static void teardown() {
     spark.stop();
     metastore.stop();
   }
 
   @Test
-  void testHivelinkIcebergSourceDelegate() {
+  public void testHivelinkIcebergSourceDelegate() {
     List<String[]> stringAsList = new ArrayList<>();
     stringAsList.add(new String[] { "bar1.1", "bar2.1" });
     stringAsList.add(new String[] { "bar1.2", "bar2.2" });
@@ -76,11 +76,11 @@ public abstract class TestHivelinkSource {
     catalog.createTable(identifier, SparkSchemaUtil.convert(schema));
     df.write().format("hivelink").mode("append").save(identifier.toString());
     Dataset<Row> rows = spark.read().format("hivelink").load(identifier.toString());
-    Assertions.assertEquals(2, rows.count());
+    Assert.assertEquals(2, rows.count());
   }
 
   @Test
-  void testIncrementalApi() {
+  public void testIncrementalApi() {
     List<String[]> stringAsList = new ArrayList<>();
     stringAsList.add(new String[] { "bar1.1", "bar2.1" });
     stringAsList.add(new String[] { "bar1.2", "bar2.2" });
@@ -103,11 +103,11 @@ public abstract class TestHivelinkSource {
     Snapshot end = t.currentSnapshot();
     Dataset<Row> rows = spark.read().format("hivelink").option("start-snapshot-id", start.snapshotId())
         .option("end-snapshot-id", end.snapshotId()).load(identifier.toString());
-    Assertions.assertEquals(2, rows.count());
+    Assert.assertEquals(2, rows.count());
   }
 
   @Test
-  void testSplitSizeOption() {
+  public void testSplitSizeOption() {
     List<String[]> stringAsList = new ArrayList<>();
     stringAsList.add(new String[] { "bar1.1", "bar2.1" });
     stringAsList.add(new String[] { "bar1.2", "bar2.2" });
@@ -131,6 +131,6 @@ public abstract class TestHivelinkSource {
     spark.conf().set("spark.sql.files.maxPartitionBytes", "5");
     int nSplitsAfter = spark.read().format("hivelink").load(identifier.toString()).javaRDD().getNumPartitions();
 
-    Assertions.assertEquals(2, Math.round(nSplitsAfter / (double) nSplitsBefore));
+    Assert.assertEquals(2, Math.round(nSplitsAfter / (double) nSplitsBefore));
   }
 }

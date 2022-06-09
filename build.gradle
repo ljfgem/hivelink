@@ -70,10 +70,6 @@ subprojects {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
   }
 
-  test {
-    useJUnitPlatform() //enables JUnit5
-  }
-
   spotless {
     java {
       importOrder('java', 'javax', 'com', 'org', 'com.linkedin.hivelink', '\\#')
